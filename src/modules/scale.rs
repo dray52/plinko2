@@ -86,6 +86,23 @@ pub fn use_virtual_resolution(virtual_width: f32, virtual_height: f32) {
     });
 }
 
+
+
+
+/// Convert physical screen coordinates into virtual coordinates
+pub fn screen_to_virtual(screen_x: f32, screen_y: f32) -> (f32, f32) {
+    let virtual_width = 1024.0;
+    let virtual_height = 768.0;
+
+    let scale_x = screen_width() / virtual_width;
+    let scale_y = screen_height() / virtual_height;
+
+    let vx = screen_x / scale_x;
+    let vy = screen_y / scale_y;
+
+    (vx, vy)
+}
+
 /// Function to get the mouse position in world coordinates based on the current camera state
 pub fn mouse_position_world() -> (f32, f32) {
     let (mouse_x, mouse_y) = ::macroquad::input::mouse_position();  // Get the raw mouse position
