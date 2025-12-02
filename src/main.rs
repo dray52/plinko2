@@ -70,11 +70,11 @@ async fn main() {
         clear_background(BLACK);
 
         // Click to spawn new ball
-        if is_mouse_button_pressed(MouseButton::Left) {
-            let (mx, my) = mouse_position();
-            let (vx, vy) = screen_to_virtual(mx, my); // <--- Convert to virtual
-            spawn_ball(&mut bodies, &mut colliders, vx, vy);
-        }
+      if is_mouse_button_pressed(MouseButton::Left) {
+    let (mx, my) = mouse_position();
+    let (vx, vy) = screen_to_virtual(mx, my); // now correctly maps to camera/world
+    spawn_ball(&mut bodies, &mut colliders, vx, vy);
+}
 
         // ---- Physics step (Rapier 0.18) ----
         pipeline.step(
