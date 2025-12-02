@@ -94,11 +94,13 @@ pub fn screen_to_virtual(screen_x: f32, screen_y: f32) -> (f32, f32) {
     let virtual_width = 1024.0;
     let virtual_height = 768.0;
 
-    let scale_x = screen_width() / virtual_width;
-    let scale_y = screen_height() / virtual_height;
+    // physical canvas size
+    let canvas_width = screen_width();
+    let canvas_height = screen_height();
 
-    let vx = screen_x / scale_x;
-    let vy = screen_y / scale_y;
+    // scale mouse to virtual resolution
+    let vx = screen_x * (virtual_width / canvas_width);
+    let vy = screen_y * (virtual_height / canvas_height);
 
     (vx, vy)
 }
