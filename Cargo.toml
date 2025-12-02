@@ -1,0 +1,16 @@
+[package]
+name = "plinko2"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+macroquad = "0.4.14"
+rapier2d = "0.18" 
+rayon = { version = "1.7", optional = true }
+[features]
+scale = []
+    default = ["scale","native"]
+     # Default feature includes "native"
+native = ["rayon"]    # The "native" feature enables Rayon
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+rayon = "1.7"  # Rayon is only included for native builds
