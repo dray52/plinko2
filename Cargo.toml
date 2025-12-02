@@ -2,8 +2,7 @@
 name = "plinko2"
 version = "0.1.0"
 edition = "2024"
-[lib]
-crate-type = ["cdylib"]  # required for wasm
+
 [dependencies]
 macroquad = "0.4.14"
 rapier2d = "0.18" 
