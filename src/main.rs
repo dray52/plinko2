@@ -25,7 +25,7 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-     // -------- Physics Init (Rapier 0.18 compatible) -------------------------
+    // -------- Physics Init (Rapier 0.18 compatible) -------------------------
     let gravity = vector![0.0, 800.0];
     let integration_params = IntegrationParameters::default();
 
@@ -40,13 +40,9 @@ async fn main() {
     let mut ccd = CCDSolver::new();
 
     // ---------------- Ground ------------------------------------------------
-    let ground_body = RigidBodyBuilder::fixed()
-        .translation(vector![400.0, 580.0])
-        .build();
+    let ground_body = RigidBodyBuilder::fixed().translation(vector![400.0, 580.0]).build();
 
-    let ground_collider = ColliderBuilder::cuboid(400.0, 20.0)
-        .friction(0.4)
-        .build();
+    let ground_collider = ColliderBuilder::cuboid(400.0, 20.0).friction(0.4).build();
 
     let gh = bodies.insert(ground_body);
     colliders.insert_with_parent(ground_collider, gh, &mut bodies);
@@ -61,13 +57,9 @@ async fn main() {
             let x_offset = if row % 2 == 0 { 30.0 } else { 0.0 };
             let x = 80.0 + col as f32 * 60.0 + x_offset;
 
-            let peg_body = RigidBodyBuilder::fixed()
-                .translation(vector![x, y])
-                .build();
+            let peg_body = RigidBodyBuilder::fixed().translation(vector![x, y]).build();
 
-            let peg_collider = ColliderBuilder::ball(peg_radius)
-                .restitution(0.5)
-                .build();
+            let peg_collider = ColliderBuilder::ball(peg_radius).restitution(0.5).build();
 
             let ph = bodies.insert(peg_body);
             colliders.insert_with_parent(peg_collider, ph, &mut bodies);
@@ -79,7 +71,7 @@ async fn main() {
 
     loop {
         use_virtual_resolution(1024.0, 768.0);
-          clear_background(BLACK);
+        clear_background(BLACK);
 
         // Click to spawn new ball
         if is_mouse_button_pressed(MouseButton::Left) {
@@ -99,9 +91,9 @@ async fn main() {
             &mut joints,
             &mut multibody_joints,
             &mut ccd,
-            None,   // <--- QueryPipeline (optional) REQUIRED in v0.18
-            &(),    // event handler placeholder
-            &(),    // hooks handler placeholder
+            None, // <--- QueryPipeline (optional) REQUIRED in v0.18
+            &(),  // event handler placeholder
+            &(),  // hooks handler placeholder
         );
 
         // ---- Draw all bodies ----
@@ -122,16 +114,7 @@ async fn main() {
                     let hx = cuboid.half_extents.x;
                     let hy = cuboid.half_extents.y;
 
-                    draw_rectangle_ex(
-                        pos.x - hx,
-                        pos.y - hy,
-                        hx * 2.0,
-                        hy * 2.0,
-                        DrawRectangleParams {
-                            rotation: rot,
-                            ..Default::default()
-                        },
-                    );
+                    draw_rectangle_ex(pos.x - hx, pos.y - hy, hx * 2.0, hy * 2.0, DrawRectangleParams { rotation: rot, ..Default::default() });
                 }
             }
         }
@@ -141,21 +124,10 @@ async fn main() {
 }
 
 // -------------------- Spawn Function ----------------------------------------
-fn spawn_ball(
-    bodies: &mut RigidBodySet,
-    colliders: &mut ColliderSet,
-    x: f32,
-    y: f32,
-) {
-    let body = RigidBodyBuilder::dynamic()
-        .translation(vector![x, y])
-        .linvel(vector![0.0, 0.0])
-        .build();
+fn spawn_ball(bodies: &mut RigidBodySet, colliders: &mut ColliderSet, x: f32, y: f32) {
+    let body = RigidBodyBuilder::dynamic().translation(vector![x, y]).linvel(vector![0.0, 0.0]).build();
 
-    let collider = ColliderBuilder::ball(12.0)
-        .restitution(0.4)
-        .friction(0.2)
-        .build();
+    let collider = ColliderBuilder::ball(12.0).restitution(0.4).friction(0.2).build();
 
     let bh = bodies.insert(body);
     colliders.insert_with_parent(collider, bh, bodies);
