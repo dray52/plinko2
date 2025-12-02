@@ -4,12 +4,13 @@ Date: 2025-12-02
 Program Details: <Plinko slot game>
 */
 
-
 mod modules;
 
-use crate::modules::scale::{use_virtual_resolution, screen_to_virtual};
+use crate::modules::scale::{screen_to_virtual, use_virtual_resolution};
+use crate::modules::text_button::TextButton;
 use macroquad::prelude::*;
 use rapier2d::prelude::*;
+use miniquad::date;
 
 /// Set up window settings before the app runs
 fn window_conf() -> Conf {
@@ -65,16 +66,34 @@ async fn main() {
     // First ball
     spawn_ball(&mut bodies, &mut colliders, 400.0, 50.0);
 
+    let btn_text = TextButton::new(800.0, 200.0, 200.0, 60.0, "Click Me", BLUE, GREEN, 30);
+rand::srand(date::now() as u64);
+let mut place =0;
     loop {
         use_virtual_resolution(1024.0, 768.0);
         clear_background(BLACK);
+        
 
         // Click to spawn new ball
-      if is_mouse_button_pressed(MouseButton::Left) {
-    let (mx, my) = mouse_position();
-    let (vx, vy) = screen_to_virtual(mx, my); // now correctly maps to camera/world
-    spawn_ball(&mut bodies, &mut colliders, vx, vy);
+        if btn_text.click() {
+            // Dice roll between 1 and 6
+let dice = rand::gen_range(1, 7);
+if dice==1 {
+    place =201;
+}else if dice==2 {
+    place =300;
+}else if dice==3 {
+    place =400;
+}else if dice==4 {
+    place =501;
+}else if dice==5 {
+    place =600;
+}else if dice==6 {
+    place =700;
+    
 }
+            spawn_ball(&mut bodies, &mut colliders, place as f32, 50.0);
+        }
 
         // ---- Physics step (Rapier 0.18) ----
         pipeline.step(
@@ -110,13 +129,7 @@ async fn main() {
                     let hx = cuboid.half_extents.x;
                     let hy = cuboid.half_extents.y;
 
-                    draw_rectangle_ex(
-                        pos.x - hx,
-                        pos.y - hy,
-                        hx * 2.0,
-                        hy * 2.0,
-                        DrawRectangleParams { rotation: rot, ..Default::default() },
-                    );
+                    draw_rectangle_ex(pos.x - hx, pos.y - hy, hx * 2.0, hy * 2.0, DrawRectangleParams { rotation: rot, ..Default::default() });
                 }
             }
         }
@@ -127,15 +140,9 @@ async fn main() {
 
 // -------------------- Spawn Function ----------------------------------------
 fn spawn_ball(bodies: &mut RigidBodySet, colliders: &mut ColliderSet, x: f32, y: f32) {
-    let body = RigidBodyBuilder::dynamic()
-        .translation(vector![x, y])
-        .linvel(vector![0.0, 0.0])
-        .build();
+    let body = RigidBodyBuilder::dynamic().translation(vector![x, y]).linvel(vector![0.0, 0.0]).build();
 
-    let collider = ColliderBuilder::ball(12.0)
-        .restitution(0.4)
-        .friction(0.2)
-        .build();
+    let collider = ColliderBuilder::ball(12.0).restitution(0.4).friction(0.2).build();
 
     let bh = bodies.insert(body);
     colliders.insert_with_parent(collider, bh, bodies);
