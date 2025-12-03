@@ -122,7 +122,7 @@ if dice==1 {
                 let shape = collider.shape();
 
                 if let Some(ball) = shape.as_ball() {
-                    draw_circle(pos.x, pos.y, ball.radius, YELLOW);
+                    draw_circle(pos.x, pos.y, ball.radius, GREEN);
                 }
 
                 if let Some(cuboid) = shape.as_cuboid() {
