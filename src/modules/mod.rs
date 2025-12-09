@@ -17,3 +17,4 @@ pub mod scale;
 pub mod collision;
 pub mod still_image;
 pub mod text_button;
+ pub mod label;
