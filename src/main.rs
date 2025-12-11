@@ -29,16 +29,16 @@ fn create_circle_peg_map(bodies: &mut RigidBodySet, colliders: &mut ColliderSet)
     let peg_radius = 8.0; // smaller pegs to keep denser layout inside walls
 
     // Keep vertical extent (10 rows) and increase horizontal density to 14 columns
-    let rows = 10;
-    let cols = 15;
+    let rows = 11;
+    let cols = 18;
     let wall_inner_left = 70.0 + 10.0;
     let wall_inner_right = 780.0 - 10.0;
-    let safety_inset = 12.0;
+    let safety_inset = 10.0;
     let usable_left = wall_inner_left + peg_radius + safety_inset;
     let usable_right = wall_inner_right - peg_radius - safety_inset;
     let start_x = usable_left;
     let spacing = if cols > 1 { (usable_right - usable_left) / (cols as f32 - 1.0) } else { 0.0 };
-    let peg_shift = -5.0;
+    let peg_shift = -3.0;
 
     for row in 0..rows {
         let y = 120.0 + row as f32 * 40.0;
@@ -59,24 +59,7 @@ fn create_circle_peg_map(bodies: &mut RigidBodySet, colliders: &mut ColliderSet)
         }
     }
 
-    // Extra left-side column: place one column-width left of the first column
-    let x_extra_base = start_x - spacing;
-    for row in 0..rows {
-        let y = 120.0 + row as f32 * 40.0;
-        let x_offset = if row % 2 == 0 { spacing / 2.0 } else { 0.0 };
-        let x = x_extra_base + x_offset + peg_shift;
-
-        let peg_body = RigidBodyBuilder::fixed()
-            .translation(vector![x, y])
-            .build();
-
-        let peg_collider = ColliderBuilder::ball(peg_radius)
-            .restitution(0.5)
-            .build();
-
-        let ph = bodies.insert(peg_body);
-        colliders.insert_with_parent(peg_collider, ph, bodies);
-    }
+   
 }
 
 // Helper: create a triangle peg map constrained to inside wall edges
@@ -85,18 +68,18 @@ fn create_triangle_peg_map(bodies: &mut RigidBodySet, colliders: &mut ColliderSe
     let height = (3.0_f32).sqrt() / 2.0 * peg_size;
 
     // Keep vertical extent (10 rows) and increase horizontal density to 14 columns
-    let rows = 10;
-    let cols = 15;
+     let rows = 11;
+    let cols = 18;
     let wall_inner_left = 70.0 + 10.0;
     let wall_inner_right = 780.0 - 10.0;
-    let safety_inset = 12.0;
+    let safety_inset = 10.0;
     // For triangle pegs approximate half-extent as peg_size/2.0
     let peg_extent = peg_size / 2.0;
     let usable_left = wall_inner_left + peg_extent + safety_inset;
     let usable_right = wall_inner_right - peg_extent - safety_inset;
     let start_x = usable_left;
     let spacing = if cols > 1 { (usable_right - usable_left) / (cols as f32 - 1.0) } else { 0.0 };
-    let peg_shift = -5.0;
+    let peg_shift = -3.0;
 
     for row in 0..rows {
         let y = 120.0 + row as f32 * 40.0;
@@ -124,31 +107,7 @@ fn create_triangle_peg_map(bodies: &mut RigidBodySet, colliders: &mut ColliderSe
         }
     }
 
-    // Extra left-side column for triangle pegs (one spacing left of first column)
-    let x_extra_base = start_x - spacing;
-    for row in 0..rows {
-        let y = 120.0 + row as f32 * 40.0;
-        let x_offset = if row % 2 == 0 { spacing / 2.0 } else { 0.0 };
-        let x = x_extra_base + x_offset + peg_shift;
-
-        let peg_body = RigidBodyBuilder::fixed()
-            .translation(vector![x, y])
-            .build();
-
-        let vertices = vec![
-            Point::new(0.0, -height / 3.0),
-            Point::new(-peg_size / 2.0, height * 2.0 / 3.0),
-            Point::new(peg_size / 2.0, height * 2.0 / 3.0),
-        ];
-
-        let peg_collider = ColliderBuilder::convex_hull(&vertices)
-            .unwrap()
-            .restitution(0.5)
-            .build();
-
-        let ph = bodies.insert(peg_body);
-        colliders.insert_with_parent(peg_collider, ph, bodies);
-    }
+    
 }
 use rapier2d::prelude::*;
 // ---------------------------
@@ -383,7 +342,7 @@ async fn main() {
         let handle = bodies.insert(body);
 
         // Create a spherical collision shape with radius 8.0 units (smaller than pegs at 10.0)
-        let collider = ColliderBuilder::ball(8.0)
+        let collider = ColliderBuilder::ball(7.0)
             .restitution(0.4)   // Bounciness coefficient: 0.4 means ball retains 40% of energy after each bounce
             .friction(0.2)      // Low friction allows ball to roll smoothly without excessive grip
             .build();
@@ -451,7 +410,7 @@ async fn main() {
     /// - x, y: Initial spawn position
     fn spawn_triangle(bodies: &mut RigidBodySet, colliders: &mut ColliderSet, x: f32, y: f32) {
         // Define triangle dimensions: 24-unit sides
-        let side = 20.0;
+        let side = 15.0;
         // Height of equilateral triangle = (√3/2) * side_length
         // This ensures all three sides are equal length (60-degree angles)
         let height = (3.0_f32).sqrt() / 2.0 * side;
@@ -489,7 +448,72 @@ async fn main() {
         // Attach collision shape to the triangle body
         colliders.insert_with_parent(collider, handle, bodies);
     }
+fn create_square_peg_map(bodies: &mut RigidBodySet, colliders: &mut ColliderSet) {
+    let peg_size = 12.0;       // side length
+    let half = peg_size / 2.0;
+    let angle = std::f32::consts::FRAC_PI_4;  // 45 degrees
+    let cos_a = angle.cos();
+    let sin_a = angle.sin();
 
+    // Square vertices BEFORE rotation
+    let base_vertices = vec![
+        Point::new(-half, -half),
+        Point::new( half, -half),
+        Point::new( half,  half),
+        Point::new(-half,  half),
+    ];
+
+    // Rotate each vertex by 45° to create a diamond shape
+    let rotated_vertices: Vec<Point<f32>> = base_vertices
+        .iter()
+        .map(|v| {
+            Point::new(
+                v.x * cos_a - v.y * sin_a,
+                v.x * sin_a + v.y * cos_a,
+            )
+        })
+        .collect();
+
+
+        
+    let rows = 11;
+    let cols = 18;
+    let wall_inner_left = 70.0 + 10.0;
+    let wall_inner_right = 780.0 - 10.0;
+    let safety_inset = 10.0;
+    let usable_left = wall_inner_left + half + safety_inset;
+    let usable_right = wall_inner_right - half - safety_inset;
+
+    let start_x = usable_left;
+    let spacing = if cols > 1 {
+        (usable_right - usable_left) / (cols as f32 - 1.0)
+    } else { 0.0 };
+
+    let peg_shift = -3.0;
+
+    for row in 0..rows {
+        let y = 120.0 + row as f32 * 40.0;
+
+        for col in 0..cols {
+            let x_offset = if row % 2 == 0 { spacing / 2.0 } else { 0.0 };
+            let x = start_x + col as f32 * spacing + x_offset + peg_shift;
+
+            let peg_body = RigidBodyBuilder::fixed()
+                .translation(vector![x, y])
+                .build();
+
+            let peg_collider = ColliderBuilder::convex_hull(&rotated_vertices)
+                .unwrap()
+                .restitution(0.5)
+                .build();
+
+            let ph = bodies.insert(peg_body);
+            colliders.insert_with_parent(peg_collider, ph, bodies);
+        }
+    }
+
+   
+}
     // ---------------------------
     // UI BUTTONS
     // ---------------------------
@@ -501,6 +525,7 @@ async fn main() {
     let btn_triangle = TextButton::new(800.0, 600.0, 200.0, 60.0, "Spawn Triangle", BLUE, GREEN, 30);
     let btn_circle_map = TextButton::new(50.0, 20.0, 150.0, 60.0, "Circle Pegs", BLUE, YELLOW, 25);
     let btn_triangle_map = TextButton::new(250.0, 20.0, 150.0, 60.0, "Triangle Pegs", ORANGE, YELLOW, 25);
+    let btn_square_map = TextButton::new(650.0, 20.0, 150.0, 60.0, "Square Pegs", BLUE, YELLOW, 25);
     let btn_clear_shapes = TextButton::new(450.0, 20.0, 150.0, 60.0, "Clear Shapes", RED, YELLOW, 25);
 
     // Variable to store random spawn position for newly created objects
@@ -610,7 +635,48 @@ async fn main() {
             // Create bins once
             create_bins(&mut bodies, &mut colliders);
         }
+if btn_square_map.click() {
+    // Reset physics managers
+    pipeline = PhysicsPipeline::new();
+    island_manager = IslandManager::new();
+    broad_phase = BroadPhase::new();
+    narrow_phase = NarrowPhase::new();
+    ccd = CCDSolver::new();
 
+    bodies = RigidBodySet::new();
+    colliders = ColliderSet::new();
+
+    // Recreate ground
+    let ground_body = RigidBodyBuilder::fixed()
+        .translation(vector![432.0, 700.0])
+        .build();
+    let ground_collider = ColliderBuilder::cuboid(355.0, 20.0)
+        .friction(0.4)
+        .build();
+    let ground_handle = bodies.insert(ground_body);
+    colliders.insert_with_parent(ground_collider, ground_handle, &mut bodies);
+
+    // Generate square peg map
+    create_square_peg_map(&mut bodies, &mut colliders);
+
+    // Recreate walls above pegs
+    let wall_body_left = RigidBodyBuilder::fixed()
+        .translation(vector![70.0, 400.0])
+        .build();
+    let wall_body_right = RigidBodyBuilder::fixed()
+        .translation(vector![780.0, 400.0])
+        .build();
+    let wall_collider = ColliderBuilder::cuboid(10.0, 400.0)
+        .friction(0.4)
+        .build();
+    let wall_handle_left = bodies.insert(wall_body_left);
+    let wall_handle_right = bodies.insert(wall_body_right);
+    colliders.insert_with_parent(wall_collider.clone(), wall_handle_left, &mut bodies);
+    colliders.insert_with_parent(wall_collider, wall_handle_right, &mut bodies);
+
+    // Bins
+    create_bins(&mut bodies, &mut colliders);
+}
         // ----- BUTTON INTERACTION LOGIC -----
         // Check if the triangle pegs map button was clicked
         if btn_triangle_map.click() {
@@ -753,7 +819,7 @@ async fn main() {
             let dice = rand::gen_range(1, 7);
             // Map dice result to X coordinate: simulates random column selection
             // Results spread across six different horizontal positions: 201, 300, 400, 501, 600, 700
-            place = match dice { 1 => 201, 2 => 300, 3 => 400, 4 => 501, 5 => 600, 6 => 700, _ => 400 };
+            place = match dice { 1 => 201, 2 => 300, 3 => 400, 4 => 501, 5 => 600, 6 => 690, _ => 400 };
             // Spawn ball at selected X position and Y=50 (near top of screen)
             spawn_ball(&mut bodies, &mut colliders, place as f32, 50.0);
         }
@@ -771,7 +837,7 @@ async fn main() {
         if btn_triangle.click() {
             // Same random position selection for consistent gameplay patterns
             let dice = rand::gen_range(1, 7);
-            place = match dice { 1 => 201, 2 => 300, 3 => 400, 4 => 501, 5 => 600, 6 => 700, _ => 400 };
+            place = match dice { 1 => 201, 2 => 300, 3 => 400, 4 => 501, 5 => 600, 6 => 690, _ => 400 };
             // Spawn triangle at the randomly selected position
             spawn_triangle(&mut bodies, &mut colliders, place as f32, 50.0);
         }
@@ -817,22 +883,16 @@ async fn main() {
 
                 // ----- RENDER CIRCLES -----
                 // This conditional handles rendering of balls (dynamic) and pegs (static/fixed)
-                if let Some(ball) = shape.as_ball() {
-                    // Color depends on the body type and size
-                    // Larger circles (ground platform) are drawn in a distinct color
-                    // Smaller circles (pegs) are RED, dynamic bodies (spawned objects) are YELLOW
+               if let Some(ball) = shape.as_ball() {
                     let color = if ball.radius > 100.0 {
-                        ORANGE // Ground platform gets a distinct orange color
+                        ORANGE // Ground platform
                     } else if body.is_fixed() {
-                        RED // Pegs are red
+                        GREEN // Pegs are now green
                     } else {
-                        YELLOW // Dynamic objects are yellow
+                        YELLOW // Dynamic objects
                     };
-                    // Draw the circle at the body's position with its collision radius
-                    // The circle is rendered filled with the selected color
                     draw_circle(pos.x, pos.y, ball.radius, color);
                 }
-
                 // ----- RENDER CUBOIDS -----
                 // This handles rendering the ground platform and walls (cuboid/rectangle shapes)
                 if let Some(cuboid) = shape.as_cuboid() {
@@ -862,7 +922,7 @@ async fn main() {
                         for v in pts.iter().skip(1) {
                             let x = pos.x + (v.x * cos_r - v.y * sin_r);
                             let y = pos.y + (v.x * sin_r + v.y * cos_r);
-                            draw_line(prev_x, prev_y, x, y, 2.0, BLUE);
+                            draw_line(prev_x, prev_y, x, y, 2.0, RED);
                             prev_x = x;
                             prev_y = y;
                         }
@@ -870,7 +930,7 @@ async fn main() {
                         // Close the polygon (connect last to first)
                         let x0 = pos.x + (first.x * cos_r - first.y * sin_r);
                         let y0 = pos.y + (first.x * sin_r + first.y * cos_r);
-                        draw_line(prev_x, prev_y, x0, y0, 2.0, BLUE);
+                        draw_line(prev_x, prev_y, x0, y0, 2.0, RED);
                     }
                 }
             }
