@@ -752,7 +752,7 @@ if btn_random.click() {
                 if let Some(convex) = shape.as_convex_polygon() {
                     // Precompute cos and sin for this body's rotation to avoid repeated trig calls
                     let cos_r = rot.cos();
-                    let sin_r = rot.sin();lbl_pize1.set_text("Prize:\n$50");
+                    let sin_r = rot.sin();
 
                     // Transform vertices and draw lines without repeated trig evaluation
                     let pts = convex.points();
