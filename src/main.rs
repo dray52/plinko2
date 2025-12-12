@@ -539,7 +539,7 @@ if btn_random.click() {
             let shapes = rand::gen_range(0, 3);
             // Roll a random number 1-6 (like rolling a dice) to determine spawn position
             // This creates variety in where objects enter the game
-            let dice = rand::gen_range(1, 7);
+            let dice = rand::gen_range(0, 7);
             let map =rand::gen_range(0, 3);
             // Map dice result to X coordinate: simulates random column selection
             // Results spread across six different horizontal positions: 201, 300, 400, 501, 600, 700
@@ -549,7 +549,7 @@ if btn_random.click() {
     3 => 400,
     4 => 501,
     5 => 590,
-    _ if shapes == 1 && dice == 6 => 720,
+    _ if shapes == 1 && dice == 6 => 710,
     6 => 690,
     _ => 400,
 };
