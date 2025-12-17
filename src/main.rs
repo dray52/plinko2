@@ -469,7 +469,8 @@ async fn main() {
    
       let btn_random = TextButton::new(-100.0, 500.0, 150.0, 60.0, "Random", ORANGE, GREEN, 25);
 
-    let slot_machine = StillImage::new("assets/slot.png", 500.0, 500.0, 800.0, 200.0, true, 1.0).await;
+    let Slime = StillImage::new("assets/GOobslime.png", 500.0, 500.0, 800.0, 200.0, true, 1.0).await;
+    let Background = StillImage::new("assets/background2.png", 2000.0, 1000.0, -500.0, 0.0, true, 1.0).await;
     // Variable to store random spawn position for newly created objects
     // Gets reassigned each time a button is clicked with a random X coordinate
     let mut place;
@@ -509,18 +510,21 @@ async fn main() {
     let bin_count = 6usize;
     let _bin_width = 1024.0 / bin_count as f32;
 
+
+    let mut lbl_title = Label::new("WELCOME TO \n  PLONKO", 800.0, 100.0, 100);
+    lbl_title.with_colors(WHITE, None);
     let mut lbl_pize1 = Label::new("Hello\nWorld", 100.0, 600.0, 30);
-    lbl_pize1.with_colors(WHITE, Some(BLACK));
+    lbl_pize1.with_colors(WHITE, None);
     let mut lbl_pize2 = Label::new("Hello\nWorld", 230.0, 600.0, 30);
-    lbl_pize2.with_colors(WHITE, Some(BLACK));
+    lbl_pize2.with_colors(WHITE, None);
     let mut lbl_pize3 = Label::new("Hello\nWorld", 340.0, 600.0, 30);
-    lbl_pize3.with_colors(WHITE, Some(BLACK));
+    lbl_pize3.with_colors(WHITE, None);
     let mut lbl_pize4 = Label::new("Hello\nWorld", 455.0, 600.0, 30);
-    lbl_pize4.with_colors(WHITE, Some(BLACK));
+    lbl_pize4.with_colors(WHITE, None);
     let mut lbl_pize5 = Label::new("Hello\nWorld", 570.0, 600.0, 30);
-    lbl_pize5.with_colors(WHITE, Some(BLACK));
+    lbl_pize5.with_colors(WHITE, None);
     let mut lbl_pize6 = Label::new("Hello\nWorld", 680.0, 600.0, 30);
-    lbl_pize6.with_colors(WHITE, Some(BLACK));
+    lbl_pize6.with_colors(WHITE, None);
     // ---------------------------
     // MAIN GAME LOOP
     // ---------------------------
@@ -535,6 +539,7 @@ async fn main() {
         // Clear the entire screen to black, preparing for fresh rendering
         // This wipes the previous frame's graphics before drawing the new frame
         clear_background(BLACK);
+        Background.draw();
 if btn_random.click() {
             let shapes = rand::gen_range(0, 3);
             // Roll a random number 1-6 (like rolling a dice) to determine spawn position
@@ -557,12 +562,12 @@ if btn_random.click() {
           
             match map{
                 0 => {
-                    lbl_pize1.set_text(&format!("$2"));
+                    lbl_pize1.set_text(&format!("$3"));
                     lbl_pize2.set_text(&format!("$1"));
                     lbl_pize3.set_text(&format!("$0"));
                     lbl_pize4.set_text(&format!("$0"));
-                    lbl_pize5.set_text(&format!("$3"));
-                    lbl_pize6.set_text(&format!("$1"));
+                    lbl_pize5.set_text(&format!("$1"));
+                    lbl_pize6.set_text(&format!("$4"));
                 
                    // Reset physics managers
             pipeline = PhysicsPipeline::new();
@@ -598,11 +603,11 @@ if btn_random.click() {
                 }
                 1 => {
                     lbl_pize1.set_text(&format!("$0"));
-                    lbl_pize2.set_text(&format!("$2"));
-                    lbl_pize3.set_text(&format!("$2"));
+                    lbl_pize2.set_text(&format!("$4"));
+                    lbl_pize3.set_text(&format!("$1"));
                     lbl_pize4.set_text(&format!("$0"));
                     lbl_pize5.set_text(&format!("$1"));
-                    lbl_pize6.set_text(&format!("$3"));
+                    lbl_pize6.set_text(&format!("$5"));
 
                      // Reset physics managers
             pipeline = PhysicsPipeline::new();
@@ -637,11 +642,11 @@ if btn_random.click() {
                 }
                 2 => { 
                     lbl_pize1.set_text(&format!("$3"));
-                    lbl_pize2.set_text(&format!("$2"));
+                    lbl_pize2.set_text(&format!("$4"));
                     lbl_pize3.set_text(&format!("$0"));
-                    lbl_pize4.set_text(&format!("$2"));
+                    lbl_pize4.set_text(&format!("$3"));
                     lbl_pize5.set_text(&format!("$1"));
-                    lbl_pize6.set_text(&format!("$1"));
+                    lbl_pize6.set_text(&format!("$5"));
 
                       // Reset physics managers
             pipeline = PhysicsPipeline::new();
@@ -787,7 +792,8 @@ if btn_random.click() {
         lbl_pize4.draw();
         lbl_pize5.draw();
         lbl_pize6.draw();
-        slot_machine.draw();
+        lbl_title.draw();
+        Slime.draw();
         // Advance to the next frame and yield control back to the graphics system
         // The await keyword allows the async runtime to handle frame timing and input processing
         // The graphics system will display the rendered frame on the screen
